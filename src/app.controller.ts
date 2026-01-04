@@ -17,6 +17,6 @@ export class AppController {
 
   @Get(`/test`)
   async test(): Promise<string> {
-    return `test2`;
+    return `test3`;
   }
 }
