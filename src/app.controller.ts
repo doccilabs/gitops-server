@@ -14,4 +14,9 @@ export class AppController {
   async healthCheck(): Promise<string> {
     return 'health';
   }
+
+  @Get(`/test`)
+  async test(): Promise<string> {
+    return `test1`;
+  }
 }
