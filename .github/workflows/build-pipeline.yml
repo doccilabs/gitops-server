@@ -37,3 +37,29 @@ jobs:
       - name: Push image to ECR
         run: |
           docker push ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Update GitOps repo image tag
+        env:
+          GITOPS_TOKEN: ${{ secrets.GITOPS_REPO_TOKEN }}
+          NEW_TAG: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          rm -rf /tmp/gitops-platform
+          git clone https://x-access-token:${GITOPS_TOKEN}@github.com/doccilabs/gitops-platform.git /tmp/gitops-platform
+          cd /tmp/gitops-platform
+
+          # yq 설치(ubuntu라면 아래로 충분; CodeBuild 환경이면 패키지 매니저에 맞게 조정)
+          if ! command -v yq >/dev/null 2>&1; then
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          fi
+
+          yq -i '.image.tag = strenv(NEW_TAG)' gitops-server/values.yaml
+
+          git config user.name "deploy-bot"
+          git config user.email "deploy-bot@users.noreply.github.com"
+
+          git add gitops-server/values.yaml
+          git commit -m "chore(gitops-server): bump image tag to ${NEW_TAG}" || exit 0
+          git push origin main
