@@ -11,12 +11,12 @@ export class AppController {
   }
 
   @Get(`/health`)
-  async healthCheck(): Promise<string> {
+  healthCheck(): string {
     return 'health';
   }
 
   @Get(`/test`)
-  async test(): Promise<string> {
-    return `test3`;
+  test(): string {
+    return `test4`;
   }
 }
