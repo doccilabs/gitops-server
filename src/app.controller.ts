@@ -21,7 +21,7 @@ export class AppController {
 
   @Get(`/test`)
   test(): string {
-    return `test5`;
+    return `test6`;
   }
 
   @Get('/env-test')
